@@ -26,10 +26,12 @@ public class Texto {
 //        $P{Usuario|user}
         List<String> listaParametros = new ArrayList<>();
         List<String> listaCampos = new ArrayList<>();
-        String mensaje = "Buenos días señor $P{Usuario|user} le informo que sus empleados se llaman:\n"
-                + "$F{Empleado|nombre} $F{Empleado|apellido} $F{Empleado|jefe|edad}\n";
+        String mensaje = "La fecha es::::: $P{Usuario|fecha}\n"
+                + "Buenos días señor $P{Usuario|user} le informo que sus empleados se llaman:\n"
+                + "Nombre: $F{Empleado|nombre} Apellido: $F{Empleado|apellido} Edad: $F{Empleado|jefe|edad}\n"
+                + "Saludos";
         Pattern patternParametros = Pattern.compile("\\$[P]\\{(.*?)\\}");
-        System.out.println("Mensaje Original \n"+mensaje);
+        System.out.println("Mensaje Original \n" + mensaje);
         Matcher matcherParametros = patternParametros.matcher(mensaje);
         while (matcherParametros.find()) {
             listaParametros.add(matcherParametros.group(0));
@@ -65,6 +67,10 @@ public class Texto {
             String token = st.nextToken();
             if (token.contains("$F")) {
                 String tokenAux = token;
+                int numeroLista = empleados.size();
+                for (int i = 0; i < numeroLista; i++) {
+                    contenidoFinal += tokenAux + "\n";
+                }
                 for (Empleado e : empleados) {
                     for (String lp : listaCampos) {
                         campos = new ArrayList<>();
@@ -73,11 +79,9 @@ public class Texto {
                         while (stz.hasMoreTokens()) {
                             campos.add(stz.nextToken());
                         }
-                        contenidoFinal += tokenAux.replaceFirst("\\$[F]\\{(.*?)\\}", cambiarCampos(campos, e));
+                        contenidoFinal = contenidoFinal.replaceFirst("\\$[F]\\{(.*?)\\}", cambiarCampos(campos, e));
                     }
                 }
-                contenidoFinal = contenidoFinal.replaceAll("\\$[F]\\{(.*?)\\}", "");
-//                contenidoFinal = contenidoFinal.replaceAll("\\s+", " ");
             } else {
                 contenidoFinal += token + "\n";
             }
@@ -152,7 +156,7 @@ public class Texto {
         return clas.equals(Boolean.class) || clas.equals(Byte.class) || clas.equals(Short.class) || clas.equals(Integer.class) || clas.equals(Long.class)
                 || clas.equals(Float.class) || clas.equals(Double.class) || clas.equals(String.class) || clas.equals(Date.class);
     }
-    
+
     public static String formatearPlantilla(String contenido) {
         String cadenaFinal = "";
         for (StringTokenizer st = new StringTokenizer(contenido, "\n"); st.hasMoreTokens();) {

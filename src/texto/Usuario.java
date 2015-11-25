@@ -6,6 +6,7 @@
 package texto;
 
 import java.lang.reflect.Field;
+import java.util.Date;
 
 /**
  *
@@ -14,6 +15,7 @@ import java.lang.reflect.Field;
 public class Usuario {
 
     private String user;
+    private Date fecha = new Date();
     private Empleado empleado;
 
     public String getUser() {
@@ -34,6 +36,14 @@ public class Usuario {
 
     public void setEmpleado(Empleado empleado) {
         this.empleado = empleado;
+    }
+
+    public Date getFecha() {
+        return fecha;
+    }
+
+    public void setFecha(Date fecha) {
+        this.fecha = fecha;
     }
 
     public final Object getValor(String nombre) {
