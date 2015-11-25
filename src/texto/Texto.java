@@ -6,6 +6,8 @@
 package texto;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -22,7 +24,7 @@ public class Texto {
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) throws NoSuchFieldException, IllegalArgumentException, IllegalAccessException, ClassNotFoundException {
+    public static void main(String[] args) throws NoSuchFieldException, IllegalArgumentException, IllegalAccessException, ClassNotFoundException, NoSuchMethodException, InvocationTargetException {
 //        $P{Usuario|user}
         List<String> listaParametros = new ArrayList<>();
         List<String> listaCampos = new ArrayList<>();
@@ -43,7 +45,8 @@ public class Texto {
         }
         String rutaClase;
         List<String> parametros;
-
+        Usuario u = new Usuario("admin");
+        u.setEmpleado(new Empleado("Esteban"));
         for (String lp : listaParametros) {
             parametros = new ArrayList<>();
             rutaClase = lp.substring(lp.indexOf("{") + 1, lp.length() - 1);
@@ -51,7 +54,7 @@ public class Texto {
             while (st.hasMoreTokens()) {
                 parametros.add(st.nextToken());
             }
-            mensaje = mensaje.replaceFirst("\\$[P]\\{(.*?)\\}", cambiarParametros(parametros));
+            mensaje = mensaje.replaceFirst("\\$[P]\\{(.*?)\\}", obtenerValores(parametros, u));
         }
         System.out.println("mensaje con Parametros $P{} \n" + mensaje);
 
@@ -79,7 +82,7 @@ public class Texto {
                         while (stz.hasMoreTokens()) {
                             campos.add(stz.nextToken());
                         }
-                        contenidoFinal = contenidoFinal.replaceFirst("\\$[F]\\{(.*?)\\}", cambiarCampos(campos, e));
+                        contenidoFinal = contenidoFinal.replaceFirst("\\$[F]\\{(.*?)\\}", obtenerValores(campos, e));
                     }
                 }
             } else {
@@ -90,50 +93,21 @@ public class Texto {
 //       
     }
 
-    public static String cambiarParametros(List<String> lista) throws NoSuchFieldException, IllegalArgumentException,
-            IllegalAccessException, ClassNotFoundException {
+    public static String obtenerValores(List<String> lista, Object objetoRaiz) throws NoSuchFieldException, IllegalArgumentException,
+            IllegalAccessException, ClassNotFoundException, NoSuchMethodException, InvocationTargetException {
         String valor = "";
-        Usuario u = new Usuario("admin");
-        u.setEmpleado(new Empleado("Esteban"));
         Field field;
-        Class claseRaiz = Usuario.class;
+        Class claseRaiz = objetoRaiz.getClass();
         Class klass = claseRaiz;
-        Object objeto = u;
+        Object objeto = objetoRaiz;
         Object instancia;
         for (int i = 1; i < lista.size(); i++) {
             field = klass.getDeclaredField(lista.get(i));
             field.setAccessible(true);
             if (isPrimitivo(field)) {
-                instancia = objeto.getClass().equals(Field.class) ? u.getValor(((Field) objeto).getName()) : objeto;
+                Method method = objetoRaiz.getClass().getDeclaredMethod("getValor", String.class);
+                instancia = objeto.getClass().equals(Field.class) ? method.invoke(objetoRaiz, ((Field) objeto).getName()) : objeto;
                 return String.valueOf(field.get(instancia));
-            } else {
-                for (Field f : klass.getDeclaredFields()) {
-                    if (f.getType().equals(field.getType())) {
-                        f.setAccessible(true);
-                        objeto = f;
-                        break;
-                    }
-                }
-                klass = field.getType();
-            }
-        }
-        return valor;
-    }
-
-    public static String cambiarCampos(List<String> lista, Empleado e) throws NoSuchFieldException, IllegalArgumentException,
-            IllegalAccessException, ClassNotFoundException {
-        String valor = "";
-        Field field;
-        Class claseRaiz = e.getClass();
-        Class klass = claseRaiz;
-        Object objeto = e;
-        Object instancia;
-        for (int i = 1; i < lista.size(); i++) {
-            field = klass.getDeclaredField(lista.get(i));
-            field.setAccessible(true);
-            if (isPrimitivo(field)) {
-                instancia = objeto.getClass().equals(Field.class) ? e.getValor(((Field) objeto).getName()) : objeto;
-                return String.valueOf(field.get(instancia)).trim();
             } else {
                 for (Field f : klass.getDeclaredFields()) {
                     if (f.getType().equals(field.getType())) {
