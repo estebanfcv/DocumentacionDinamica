@@ -51,9 +51,8 @@ public class Texto {
         for (String lp : listaParametros) {
             parametros = new ArrayList<>();
             rutaClase = lp.substring(lp.indexOf("{") + 1, lp.length() - 1);
-            StringTokenizer st = new StringTokenizer(rutaClase, "|");
-            while (st.hasMoreTokens()) {
-                parametros.add(st.nextToken());
+            for (StringTokenizer stk = new StringTokenizer(rutaClase, "|"); stk.hasMoreTokens();) {
+               parametros.add(stk.nextToken());
             }
             mensaje = mensaje.replaceFirst("\\$[P]\\{(.*?)\\}", obtenerValores(parametros, u));
         }
@@ -61,7 +60,7 @@ public class Texto {
 
         List<String> campos;
 
-        List<Empleado> empleados = new ArrayList<>();
+        List<Object> empleados = new ArrayList<>();
         empleados.add(new Empleado("Andrea", "Alvarez", new Jefe(30)));
         empleados.add(new Empleado("Iliana", "Perez", new Jefe(25)));
         empleados.add(new Empleado("Juan", "Sarrelangue", new Jefe(28)));
@@ -75,13 +74,12 @@ public class Texto {
                 for (int i = 0; i < numeroLista; i++) {
                     contenidoFinal += tokenAux + "\n";
                 }
-                for (Empleado e : empleados) {
+                for (Object e : empleados) {
                     for (String lp : listaCampos) {
                         campos = new ArrayList<>();
                         rutaClase = lp.substring(lp.indexOf("{") + 1, lp.length() - 1);
-                        StringTokenizer stz = new StringTokenizer(rutaClase, "|");
-                        while (stz.hasMoreTokens()) {
-                            campos.add(stz.nextToken());
+                        for (StringTokenizer stk = new StringTokenizer(rutaClase, "|"); stk.hasMoreTokens();) {
+                            campos.add(stk.nextToken());
                         }
                         contenidoFinal = contenidoFinal.replaceFirst("\\$[F]\\{(.*?)\\}", obtenerValores(campos, e));
                     }
@@ -91,7 +89,6 @@ public class Texto {
             }
         }
         System.out.println("mensaje con Fields $F{}\n " + contenidoFinal);
-//       
     }
 
     public static String obtenerValores(List<String> valores, Object objetoRaiz) throws NoSuchFieldException, IllegalArgumentException,

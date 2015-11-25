@@ -54,7 +54,7 @@ public class Usuario {
     public final Object getValor(String nombre) {
         Object valor = new Object();
         try {
-            Field f = Usuario.class.getDeclaredField(nombre);
+            Field f = getClass().getDeclaredField(nombre);
             f.setAccessible(true);
                 valor = f.get(this);
         } catch (Exception e) {

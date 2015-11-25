@@ -55,13 +55,10 @@ public class Empleado {
         this.apellido = apellido;
         this.jefe = jefe;
     }
-    
-    
-
     public final Object getValor(String nombre) {
         Object valor = new Object();
         try {
-            Field f = Empleado.class.getDeclaredField(nombre);
+            Field f = getClass().getDeclaredField(nombre);
             f.setAccessible(true);
             valor = f.get(this);
         } catch (Exception e) {
@@ -69,5 +66,4 @@ public class Empleado {
         }
         return valor;
     }
-
 }
