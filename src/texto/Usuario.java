@@ -18,6 +18,11 @@ public class Usuario {
     private Date fecha = new Date();
     private Empleado empleado;
 
+    public Usuario() {
+    }
+    
+    
+
     public String getUser() {
         return user;
     }
@@ -51,10 +56,19 @@ public class Usuario {
         try {
             Field f = Usuario.class.getDeclaredField(nombre);
             f.setAccessible(true);
-            valor = f.get(this);
+                valor = f.get(this);
         } catch (Exception e) {
             e.printStackTrace();
         }
         return valor;
+    }
+
+    private boolean isPrimitivo(Field f) {
+        if (f.getType().isPrimitive()) {
+            return true;
+        }
+        Class clas = f.getType();
+        return clas.equals(Boolean.class) || clas.equals(Byte.class) || clas.equals(Short.class) || clas.equals(Integer.class) || clas.equals(Long.class)
+                || clas.equals(Float.class) || clas.equals(Double.class) || clas.equals(String.class) || clas.equals(Date.class);
     }
 }

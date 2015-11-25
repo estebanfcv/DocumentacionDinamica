@@ -45,7 +45,8 @@ public class Texto {
         }
         String rutaClase;
         List<String> parametros;
-        Usuario u = new Usuario("admin");
+        Usuario u = new Usuario();
+        u.setUser("admin");
         u.setEmpleado(new Empleado("Esteban"));
         for (String lp : listaParametros) {
             parametros = new ArrayList<>();
@@ -93,33 +94,32 @@ public class Texto {
 //       
     }
 
-    public static String obtenerValores(List<String> lista, Object objetoRaiz) throws NoSuchFieldException, IllegalArgumentException,
+    public static String obtenerValores(List<String> valores, Object objetoRaiz) throws NoSuchFieldException, IllegalArgumentException,
             IllegalAccessException, ClassNotFoundException, NoSuchMethodException, InvocationTargetException {
-        String valor = "";
         Field field;
         Class claseRaiz = objetoRaiz.getClass();
         Class klass = claseRaiz;
-        Object objeto = objetoRaiz;
+        Object objFieldPrim = objetoRaiz;
         Object instancia;
-        for (int i = 1; i < lista.size(); i++) {
-            field = klass.getDeclaredField(lista.get(i));
+        for (int i = 1; i < valores.size(); i++) {
+            field = klass.getDeclaredField(valores.get(i));
             field.setAccessible(true);
             if (isPrimitivo(field)) {
                 Method method = objetoRaiz.getClass().getDeclaredMethod("getValor", String.class);
-                instancia = objeto.getClass().equals(Field.class) ? method.invoke(objetoRaiz, ((Field) objeto).getName()) : objeto;
+                instancia = objFieldPrim.getClass().equals(Field.class) ? method.invoke(objetoRaiz, ((Field) objFieldPrim).getName()) : objFieldPrim;
                 return String.valueOf(field.get(instancia));
             } else {
                 for (Field f : klass.getDeclaredFields()) {
                     if (f.getType().equals(field.getType())) {
                         f.setAccessible(true);
-                        objeto = f;
+                        objFieldPrim = f;
                         break;
                     }
                 }
                 klass = field.getType();
             }
         }
-        return valor;
+        return "";
     }
 
     private static boolean isPrimitivo(Field f) {
